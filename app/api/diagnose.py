@@ -14,6 +14,8 @@ from fastapi.params import Depends
 from app.agent.diagnose_agent import DiagnoseAgent
 from app.application.diagnose_service import DiagnoseService
 from app.domain.models import DiagnoseRequest, DiagnoseResponse
+from app.infrastructure.llm.deepseek_client import DeepSeekClient
+from app.infrastructure.llm.fake_llm_client import FakeLLMClient
 from app.infrastructure.llm.llm_client import LLMClient
 
 # ====================
@@ -21,7 +23,7 @@ from app.infrastructure.llm.llm_client import LLMClient
 # ====================
 
 def get_llm_client() -> LLMClient:
-    return LLMClient()
+    return DeepSeekClient()
 def get_diagnose_agent(llm_client: LLMClient = Depends(get_llm_client)) -> DiagnoseAgent:
     return DiagnoseAgent(llm_client=llm_client)
 def get_diagnose_service(agent: DiagnoseAgent = Depends(get_diagnose_agent)) -> DiagnoseService:

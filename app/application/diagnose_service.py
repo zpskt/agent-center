@@ -15,4 +15,4 @@ class DiagnoseService:
     def __init__(self,agent:DiagnoseAgent):
         self.agent = agent
     def diagnose(self,request: DiagnoseRequest):
-        return self.agent.excute(request)
+        return self.agent.execute(request)

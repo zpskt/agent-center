@@ -8,6 +8,10 @@
 @Date    ：2026/8/22 21:05 
 @Description： 
 '''
-class LLMClient:
-    def invoke(self,msg:str):
-        return {"message": f"llm invoked: {msg}"}
+from abc import ABC, abstractmethod
+
+
+class LLMClient(ABC):
+    @abstractmethod
+    def invoke(self,prompt:str):
+        return prompt

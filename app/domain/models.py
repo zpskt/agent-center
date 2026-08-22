@@ -16,8 +16,8 @@ class DiagnoseRequest(BaseModel):
     请求体
     """
     message: str
+
 class DiagnoseResponse(BaseModel):
-    """
-    响应体
-    """
-    message: str
+    diagnosis: str
+    confidence: float
+    recommendations: list[str]
