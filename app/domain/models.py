@@ -16,8 +16,14 @@ class DiagnoseRequest(BaseModel):
     请求体
     """
     message: str
+    user_id: str
+
 
 class DiagnoseResponse(BaseModel):
     diagnosis: str
     confidence: float
     recommendations: list[str]
+
+class DiagnosisContext(BaseModel):
+    user_id: str
+    message: str

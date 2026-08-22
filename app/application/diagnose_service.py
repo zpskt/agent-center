@@ -9,10 +9,15 @@
 @Description： 
 '''
 from app.agent.diagnose_agent import DiagnoseAgent
-from app.domain.models import DiagnoseRequest
+from app.domain.models import DiagnoseRequest, DiagnosisContext
+
 
 class DiagnoseService:
     def __init__(self,agent:DiagnoseAgent):
         self.agent = agent
     def diagnose(self,request: DiagnoseRequest):
-        return self.agent.execute(request)
+        context = DiagnosisContext(
+            user_id=request.user_id,
+            message=request.message,
+        )
+        return self.agent.execute(context)
