@@ -1,0 +1,23 @@
+#!/usr/bin/env python
+# -*- coding: UTF-8 -*-
+'''
+@Project ：agent-center 
+@File    ：models.py
+@IDE     ：PyCharm 
+@Author  ：张鹏
+@Date    ：2026/8/22 17:42 
+@Description： 
+'''
+from pydantic import BaseModel
+
+
+class DiagnoseRequest(BaseModel):
+    """
+    请求体
+    """
+    message: str
+class DiagnoseResponse(BaseModel):
+    """
+    响应体
+    """
+    message: str
