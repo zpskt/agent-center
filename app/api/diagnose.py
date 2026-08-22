@@ -33,5 +33,5 @@ router = APIRouter(prefix='/diagnose')
 
 
 @router.post('/',response_model=DiagnoseResponse)
-def diagnose(request: DiagnoseRequest, service: DiagnoseService = Depends(get_diagnose_service)):
-    return service.diagnose(request)
+async def diagnose(request: DiagnoseRequest, service: DiagnoseService = Depends(get_diagnose_service)):
+    return await service.diagnose(request)

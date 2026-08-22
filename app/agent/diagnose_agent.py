@@ -21,7 +21,7 @@ class DiagnoseAgent:
         self.llm_client = llm_client
         self.prompt = ""
 
-    def execute(self, context: DiagnosisContext) -> DiagnoseResponse:
+    async def execute(self, context: DiagnosisContext) -> DiagnoseResponse:
         prompt = f"""
         {DIAGNOSE_SYSTEM_PROMPT}
 
@@ -29,7 +29,7 @@ class DiagnoseAgent:
         {context.message}
         """
 
-        result = self.llm_client.invoke(prompt)
+        result = await self.llm_client.invoke(prompt)
         try:
             return DiagnoseResponse.model_validate_json(result)
         except ValidationError as e:

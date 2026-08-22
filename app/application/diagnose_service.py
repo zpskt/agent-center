@@ -15,9 +15,9 @@ from app.domain.models import DiagnoseRequest, DiagnosisContext
 class DiagnoseService:
     def __init__(self,agent:DiagnoseAgent):
         self.agent = agent
-    def diagnose(self,request: DiagnoseRequest):
+    async def diagnose(self,request: DiagnoseRequest):
         context = DiagnosisContext(
             user_id=request.user_id,
             message=request.message,
         )
-        return self.agent.execute(context)
+        return await self.agent.execute(context)

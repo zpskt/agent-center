@@ -22,7 +22,7 @@ class DeepSeekClient(LLMClient):
             base_url=settings.llm_base_url,
         )
 
-    def invoke(self, prompt: str) -> str:
+    async def invoke(self, prompt: str) -> str:
         response = self.client.chat.completions.create(
             model=settings.llm_model,
             messages=[
