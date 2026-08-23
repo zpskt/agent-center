@@ -15,7 +15,7 @@ from starlette.responses import JSONResponse
 
 from app.api.diagnose import router as diagnose_router
 from app.api.health import router as health_router
-from app.domain.exceptions import DiagnosisError
+from app.domain.exceptions import DiagnosisError, LLMResponseError
 
 app = FastAPI()
 @app.exception_handler(DiagnosisError)
@@ -30,6 +30,21 @@ async def diagnosis_exception_handler(
             "message": exc.message,
         },
     )
+@app.exception_handler(LLMResponseError)
+async def llm_error_handler(
+    request,
+    exc
+):
+    return JSONResponse(
+        status_code=502,
+        content={
+            "message": str(exc)
+        }
+    )
+app.add_exception_handler(
+    LLMResponseError,
+    llm_error_handler,
+)
 app.include_router(health_router)
 app.include_router(diagnose_router)
 

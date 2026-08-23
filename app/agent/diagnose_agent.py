@@ -11,7 +11,7 @@
 from pydantic import ValidationError
 
 from app.agent.prompts.diagnose_prompt import DIAGNOSE_SYSTEM_PROMPT
-from app.domain.exceptions import DiagnosisError
+from app.domain.exceptions import DiagnosisError, LLMResponseError
 from app.domain.models import DiagnoseResponse, DiagnosisContext
 from app.infrastructure.llm.llm_client import LLMClient
 
@@ -21,21 +21,30 @@ class DiagnoseAgent:
         self.llm_client = llm_client
         self.prompt = ""
 
-    async def execute(self, context: DiagnosisContext) -> DiagnoseResponse:
-        history_text = "\n".join(
-            f"{message.role}: {message.content}"
-            for message in context.history
-        )
-        prompt = f"""
+    def _build_prompt(self, context: DiagnosisContext):
+        return f"""
         {DIAGNOSE_SYSTEM_PROMPT}
         历史对话：
-        {history_text}
+        {context.history}
         用户问题：
         {context.message}
         """
 
-        result = await self.llm_client.invoke(prompt)
+    def parse_response(self, result: str) -> DiagnoseResponse:
         try:
             return DiagnoseResponse.model_validate_json(result)
+
+        except ValidationError as e:
+            raise LLMResponseError(
+                "LLM response invalid"
+            ) from e
+
+    async def execute(self, context: DiagnosisContext) -> DiagnoseResponse:
+
+        prompt = self._build_prompt(context)
+
+        result = await self.llm_client.invoke(prompt)
+        try:
+            return self.parse_response(result)
         except ValidationError as e:
             raise DiagnosisError("LLM 返回的诊断结果格式不正确") from e
