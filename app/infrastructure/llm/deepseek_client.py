@@ -8,20 +8,31 @@
 @Date    ：2026/8/22 22:00 
 @Description： 
 '''
-from openai import OpenAI
-
+from openai import AsyncOpenAI
 from app.config.settings import settings
 from app.infrastructure.llm.llm_client import LLMClient
-
+from tenacity import (
+    retry,
+    stop_after_attempt,
+    wait_exponential,
+)
 
 class DeepSeekClient(LLMClient):
 
     def __init__(self):
-        self.client = OpenAI(
+        self.client = AsyncOpenAI(
             api_key=settings.llm_api_key,
             base_url=settings.llm_base_url,
+            timeout=settings.llm_timeout,
         )
-
+    @retry(
+        stop=stop_after_attempt(3),
+        wait=wait_exponential(
+            multiplier=1,
+            min=1,
+            max=5,
+        ),
+    )
     async def invoke(self, prompt: str) -> str:
         response = self.client.chat.completions.create(
             model=settings.llm_model,

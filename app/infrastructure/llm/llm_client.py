@@ -14,4 +14,4 @@ from abc import ABC, abstractmethod
 class LLMClient(ABC):
     @abstractmethod
     async def invoke(self,prompt:str):
-        return prompt
+        pass

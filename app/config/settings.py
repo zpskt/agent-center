@@ -15,6 +15,7 @@ class Settings(BaseSettings):
     llm_api_key: str
     llm_model: str
     llm_base_url: str
+    llm_timeout: int
 
     model_config = SettingsConfigDict(
         env_file=".env",
