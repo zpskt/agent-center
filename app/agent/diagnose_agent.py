@@ -10,10 +10,11 @@
 '''
 from pydantic import ValidationError
 
-from app.agent.prompts.diagnose_prompt import DIAGNOSE_SYSTEM_PROMPT
+from app.prompts.diagnose_prompt import DIAGNOSE_SYSTEM_PROMPT
 from app.domain.exceptions import DiagnosisError, LLMResponseError
 from app.domain.models import DiagnoseResponse, DiagnosisContext
 from app.infrastructure.llm.llm_client import LLMClient
+from app.prompts.diagnose_prompt import build_diagnose_prompt
 
 
 class DiagnoseAgent:
@@ -22,13 +23,7 @@ class DiagnoseAgent:
         self.prompt = ""
 
     def _build_prompt(self, context: DiagnosisContext):
-        return f"""
-        {DIAGNOSE_SYSTEM_PROMPT}
-        历史对话：
-        {context.history}
-        用户问题：
-        {context.message}
-        """
+        return build_diagnose_prompt(context)
 
     def parse_response(self, result: str) -> DiagnoseResponse:
         try:
