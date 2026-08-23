@@ -10,14 +10,41 @@
 '''
 from app.agent.diagnose_agent import DiagnoseAgent
 from app.domain.models import DiagnoseRequest, DiagnosisContext
+from app.domain.repositories.conversation_repository import ConversationRepository
 
 
 class DiagnoseService:
-    def __init__(self,agent:DiagnoseAgent):
+    def __init__(self, agent:DiagnoseAgent, conversation_repository:ConversationRepository):
         self.agent = agent
-    async def diagnose(self,request: DiagnoseRequest):
+        self.conversation_repository = conversation_repository
+
+    async def diagnose(self, request: DiagnoseRequest):
+        history = await self.conversation_repository.get_history(
+            user_id=request.user_id,
+            conversation_id=request.conversation_id,
+        )
+
         context = DiagnosisContext(
             user_id=request.user_id,
+            conversation_id=request.conversation_id,
             message=request.message,
+            history=history,
         )
-        return await self.agent.execute(context)
+
+        result = await self.agent.execute(context)
+
+        await self.conversation_repository.append_message(
+            user_id=request.user_id,
+            conversation_id=request.conversation_id,
+            role="user",
+            content=request.message,
+        )
+
+        await self.conversation_repository.append_message(
+            user_id=request.user_id,
+            conversation_id=request.conversation_id,
+            role="assistant",
+            content=result.diagnosis,
+        )
+
+        return result

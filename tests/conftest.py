@@ -14,8 +14,12 @@ from app.infrastructure.llm.llm_client import LLMClient
 
 
 class FakeLLMClient(LLMClient):
+    def __init__(self):
+        self.last_prompt = None
 
     async def invoke(self, prompt: str) -> str:
+        self.last_prompt = prompt
+
         return """
         {
             "diagnosis": "测试诊断",
@@ -25,6 +29,7 @@ class FakeLLMClient(LLMClient):
             ]
         }
         """
+
 class InvalidLLMClient(LLMClient):
 
     async def invoke(self, prompt: str) -> str:

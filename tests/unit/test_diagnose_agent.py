@@ -26,11 +26,27 @@ async def test_diagnose_agent(fake_llm_client):
     agent = DiagnoseAgent(
         llm_client=fake_llm_client
     )
-
     context = DiagnosisContext(
         user_id="user-001",
-        message="测试问题",
+        conversation_id="conv-001",
+        message="第二个问题",
+        history=[
+            {
+                "role": "user",
+                "content": "第一个问题",
+            },
+            {
+                "role": "assistant",
+                "content": "第一次回答",
+            },
+        ],
     )
+
+    result = await agent.execute(context)
+
+    assert "第一个问题" in fake_llm_client.last_prompt
+    assert "第一次回答" in fake_llm_client.last_prompt
+    assert "第二个问题" in fake_llm_client.last_prompt
 
     result = await agent.execute(context)
 
@@ -47,6 +63,7 @@ async def test_diagnose_agent_invalid_llm_response():
 
     context = DiagnosisContext(
         user_id="user-001",
+        conversation_id="conv-001",
         message="测试问题",
     )
 

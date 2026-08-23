@@ -22,9 +22,14 @@ class DiagnoseAgent:
         self.prompt = ""
 
     async def execute(self, context: DiagnosisContext) -> DiagnoseResponse:
+        history_text = "\n".join(
+            f"{item['role']}: {item['content']}"
+            for item in context.history
+        )
         prompt = f"""
         {DIAGNOSE_SYSTEM_PROMPT}
-
+        历史对话：
+        {history_text}
         用户问题：
         {context.message}
         """

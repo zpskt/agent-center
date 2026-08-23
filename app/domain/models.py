@@ -8,7 +8,7 @@
 @Date    ：2026/8/22 17:42 
 @Description： 
 '''
-from pydantic import BaseModel
+from pydantic import BaseModel,Field
 
 
 class DiagnoseRequest(BaseModel):
@@ -16,6 +16,7 @@ class DiagnoseRequest(BaseModel):
     请求体
     """
     message: str
+    conversation_id: str
     user_id: str
 
 
@@ -26,4 +27,6 @@ class DiagnoseResponse(BaseModel):
 
 class DiagnosisContext(BaseModel):
     user_id: str
+    conversation_id: str
     message: str
+    history: list[dict[str, str]] = Field(default_factory=list)

@@ -42,6 +42,7 @@ def test_diagnose_api():
         "/diagnose/",
         json={
             "user_id": "user-001",
+            "conversation_id": "conv-001",
             "message": "测试问题",
         },
     )
