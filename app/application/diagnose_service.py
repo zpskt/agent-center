@@ -8,6 +8,7 @@
 @Date    ：2026/8/22 20:53 
 @Description： 
 '''
+from app.agent.agent_runner import AgentRunner
 from app.agent.diagnose_agent import DiagnoseAgent
 from app.domain.context import DiagnosisContext, ConversationMessage
 from app.domain.models import DiagnoseRequest
@@ -15,9 +16,10 @@ from app.domain.repositories.conversation_repository import ConversationReposito
 
 
 class DiagnoseService:
-    def __init__(self, agent:DiagnoseAgent, conversation_repository:ConversationRepository):
+    def __init__(self, agent:DiagnoseAgent, conversation_repository:ConversationRepository, runner:AgentRunner):
         self.agent = agent
         self.conversation_repository = conversation_repository
+        self.runner = runner
 
     async def diagnose(self, request: DiagnoseRequest):
         history = await self.conversation_repository.get_history(

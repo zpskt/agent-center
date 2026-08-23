@@ -13,13 +13,21 @@ from pydantic import ValidationError
 from app.agent.base_agent import BaseAgent
 from app.domain.context import DiagnosisContext
 from app.domain.exceptions import DiagnosisError, LLMResponseError
-from app.domain.models import DiagnoseResponse
+from app.domain.models import DiagnoseResponse, AgentAction
 from app.infrastructure.llm.llm_client import LLMClient
 from app.prompts.diagnose import build_prompt
 from app.prompts.registry import get_prompt
 
 
 class DiagnoseAgent(BaseAgent):
+    def parse_action(
+            self,
+            result: str
+    ) -> AgentAction:
+
+        return AgentAction.model_validate_json(
+            result
+        )
 
     def build_prompt(self, context: DiagnosisContext):
         prompt_builder = get_prompt(
