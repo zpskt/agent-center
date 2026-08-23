@@ -26,7 +26,8 @@ def build_prompt(
 
     return f"""
 {DIAGNOSE_SYSTEM_PROMPT}
-
+可用工具:
+{context.available_tools}
 历史对话：
 {history_text}
 

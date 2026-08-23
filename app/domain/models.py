@@ -8,8 +8,8 @@
 @Date    ：2026/8/22 17:42 
 @Description： 
 '''
+from typing import Literal
 from pydantic import BaseModel
-
 
 
 class DiagnoseRequest(BaseModel):
@@ -25,3 +25,14 @@ class DiagnoseResponse(BaseModel):
     diagnosis: str
     confidence: float
     recommendations: list[str]
+
+class AgentAction(BaseModel):
+
+    action: Literal[
+        "tool_call",
+        "final"
+    ]
+
+    tool_name: str | None = None
+
+    arguments: dict = {}
