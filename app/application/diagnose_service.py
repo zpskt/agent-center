@@ -9,7 +9,7 @@
 @Description： 
 '''
 from app.agent.diagnose_agent import DiagnoseAgent
-from app.domain.models import DiagnoseRequest, DiagnosisContext
+from app.domain.models import DiagnoseRequest, DiagnosisContext, ConversationMessage
 from app.domain.repositories.conversation_repository import ConversationRepository
 
 
@@ -23,6 +23,14 @@ class DiagnoseService:
             user_id=request.user_id,
             conversation_id=request.conversation_id,
         )
+        await self.conversation_repository.append_message(
+            user_id=request.user_id,
+            conversation_id=request.conversation_id,
+            message=ConversationMessage(
+                role="user",
+                content=request.message,
+            ),
+            )
 
         context = DiagnosisContext(
             user_id=request.user_id,
@@ -36,15 +44,10 @@ class DiagnoseService:
         await self.conversation_repository.append_message(
             user_id=request.user_id,
             conversation_id=request.conversation_id,
-            role="user",
-            content=request.message,
-        )
-
-        await self.conversation_repository.append_message(
-            user_id=request.user_id,
-            conversation_id=request.conversation_id,
-            role="assistant",
-            content=result.diagnosis,
+            message=ConversationMessage(
+                role="assistant",
+                content=result.diagnosis,
+            )
         )
 
         return result

@@ -8,6 +8,7 @@
 @Date    ：2026/8/23 09:05 
 @Description： 
 '''
+from app.domain.models import ConversationMessage
 from app.domain.repositories.conversation_repository import ConversationRepository
 
 
@@ -32,15 +33,14 @@ class MemoryConversationRepository(ConversationRepository):
         self,
         user_id: str,
         conversation_id: str,
-        role: str,
-        content: str,
-    ) -> None:
+        message: ConversationMessage,
+            ) -> None:
         key = (user_id, conversation_id)
 
         if key not in self._conversations:
             self._conversations[key] = []
 
         self._conversations[key].append({
-            "role": role,
-            "content": content,
+            "role": message.role,
+            "content": message.content,
         })

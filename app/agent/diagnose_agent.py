@@ -23,8 +23,8 @@ class DiagnoseAgent:
 
     async def execute(self, context: DiagnosisContext) -> DiagnoseResponse:
         history_text = "\n".join(
-            f"{item['role']}: {item['content']}"
-            for item in context.history
+            f"{message.role}: {message.content}"
+            for message in context.history
         )
         prompt = f"""
         {DIAGNOSE_SYSTEM_PROMPT}

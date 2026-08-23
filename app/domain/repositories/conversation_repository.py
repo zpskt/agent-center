@@ -10,6 +10,8 @@
 '''
 from abc import abstractmethod, ABC
 
+from app.domain.models import ConversationMessage
+
 
 class ConversationRepository(ABC):
     @abstractmethod
@@ -17,7 +19,7 @@ class ConversationRepository(ABC):
         self,
         user_id: str,
         conversation_id: str,
-    ) -> list[dict[str, str]]:
+    ) -> list[ConversationMessage]:
         ...
 
     @abstractmethod
@@ -25,7 +27,6 @@ class ConversationRepository(ABC):
         self,
         user_id: str,
         conversation_id: str,
-        role: str,
-        content: str,
+        message: ConversationMessage,
     ) -> None:
         ...

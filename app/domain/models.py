@@ -9,7 +9,11 @@
 @Description： 
 '''
 from pydantic import BaseModel,Field
+from typing import Literal
 
+class ConversationMessage(BaseModel):
+    role: Literal["user", "assistant"]
+    content: str
 
 class DiagnoseRequest(BaseModel):
     """
@@ -29,4 +33,4 @@ class DiagnosisContext(BaseModel):
     user_id: str
     conversation_id: str
     message: str
-    history: list[dict[str, str]] = Field(default_factory=list)
+    history: list[ConversationMessage] = Field(default_factory=list)
