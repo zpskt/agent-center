@@ -10,7 +10,7 @@
 '''
 from abc import abstractmethod, ABC
 
-from app.domain.models import ConversationMessage
+from app.domain.context import ConversationMessage
 
 
 class ConversationRepository(ABC):

@@ -11,6 +11,7 @@
 from fastapi import APIRouter
 from fastapi.params import Depends
 
+from app.agent.base_agent import BaseAgent
 from app.agent.diagnose_agent import DiagnoseAgent
 from app.application.diagnose_service import DiagnoseService
 from app.domain.models import DiagnoseRequest, DiagnoseResponse
@@ -27,7 +28,7 @@ def get_conversation_repository() -> ConversationRepository:
     return MemoryConversationRepository()
 def get_llm_client() -> LLMClient:
     return DeepSeekClient()
-def get_diagnose_agent(llm_client: LLMClient = Depends(get_llm_client)) -> DiagnoseAgent:
+def get_diagnose_agent(llm_client: LLMClient = Depends(get_llm_client)) -> BaseAgent:
     return DiagnoseAgent(llm_client=llm_client)
 def get_diagnose_service(agent: DiagnoseAgent = Depends(get_diagnose_agent),
                          conversation_repository: ConversationRepository = Depends(get_conversation_repository)) -> DiagnoseService:

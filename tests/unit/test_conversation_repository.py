@@ -10,7 +10,7 @@
 '''
 import pytest
 
-from app.domain.models import ConversationMessage
+from app.domain.context import ConversationMessage
 from app.infrastructure.conversation.memory_conversation_repository import MemoryConversationRepository
 
 

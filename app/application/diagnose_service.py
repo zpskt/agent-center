@@ -9,7 +9,8 @@
 @Description： 
 '''
 from app.agent.diagnose_agent import DiagnoseAgent
-from app.domain.models import DiagnoseRequest, DiagnosisContext, ConversationMessage
+from app.domain.context import DiagnosisContext, ConversationMessage
+from app.domain.models import DiagnoseRequest
 from app.domain.repositories.conversation_repository import ConversationRepository
 
 

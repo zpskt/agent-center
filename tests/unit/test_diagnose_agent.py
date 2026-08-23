@@ -11,9 +11,10 @@
 import pytest
 
 from app.agent.diagnose_agent import DiagnoseAgent
+from app.domain.context import DiagnosisContext
 from app.domain.exceptions import DiagnosisError
 from app.infrastructure.llm.llm_client import LLMClient
-from app.domain.models import DiagnosisContext, DiagnoseResponse
+from app.domain.models import  DiagnoseResponse
 
 class InvalidLLMClient(LLMClient):
 

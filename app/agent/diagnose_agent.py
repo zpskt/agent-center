@@ -10,20 +10,22 @@
 '''
 from pydantic import ValidationError
 
-from app.prompts.diagnose_prompt import DIAGNOSE_SYSTEM_PROMPT
+from app.agent.base_agent import BaseAgent
+from app.domain.context import DiagnosisContext
 from app.domain.exceptions import DiagnosisError, LLMResponseError
-from app.domain.models import DiagnoseResponse, DiagnosisContext
+from app.domain.models import DiagnoseResponse
 from app.infrastructure.llm.llm_client import LLMClient
-from app.prompts.diagnose_prompt import build_diagnose_prompt
+from app.prompts.diagnose import build_prompt
+from app.prompts.registry import get_prompt
 
 
-class DiagnoseAgent:
-    def __init__(self,llm_client: LLMClient):
-        self.llm_client = llm_client
-        self.prompt = ""
+class DiagnoseAgent(BaseAgent):
 
-    def _build_prompt(self, context: DiagnosisContext):
-        return build_diagnose_prompt(context)
+    def build_prompt(self, context: DiagnosisContext):
+        prompt_builder = get_prompt(
+            "diagnose"
+        )
+        return prompt_builder(context)
 
     def parse_response(self, result: str) -> DiagnoseResponse:
         try:
@@ -36,7 +38,7 @@ class DiagnoseAgent:
 
     async def execute(self, context: DiagnosisContext) -> DiagnoseResponse:
 
-        prompt = self._build_prompt(context)
+        prompt = self.build_prompt(context)
 
         result = await self.llm_client.invoke(prompt)
         try:

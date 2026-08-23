@@ -8,7 +8,7 @@
 @Date    ：2026/8/23 09:05 
 @Description： 
 '''
-from app.domain.models import ConversationMessage
+from app.domain.context import ConversationMessage
 from app.domain.repositories.conversation_repository import ConversationRepository
 
 

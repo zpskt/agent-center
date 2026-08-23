@@ -8,12 +8,9 @@
 @Date    ：2026/8/22 17:42 
 @Description： 
 '''
-from pydantic import BaseModel,Field
-from typing import Literal
+from pydantic import BaseModel
 
-class ConversationMessage(BaseModel):
-    role: Literal["user", "assistant"]
-    content: str
+
 
 class DiagnoseRequest(BaseModel):
     """
@@ -28,9 +25,3 @@ class DiagnoseResponse(BaseModel):
     diagnosis: str
     confidence: float
     recommendations: list[str]
-
-class DiagnosisContext(BaseModel):
-    user_id: str
-    conversation_id: str
-    message: str
-    history: list[ConversationMessage] = Field(default_factory=list)
