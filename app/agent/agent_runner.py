@@ -28,17 +28,22 @@ class AgentRunner:
         self,
         context: AgentContext
     ):
-        action =  await self.agent.execute(context)
-        if action.action == "final":
-            return action
+        MAX_ITERATIONS = 5
+        for _ in range(MAX_ITERATIONS):
 
-        if action.action == "tool_call":
-            result = await self.tool_executor.execute(
-                action.tool_name,
-                **action.arguments,
-            )
+            action = await self.agent.execute(context)
 
-            context.metadata["tool_result"] = result
+            if action.action == "final":
+                return action
 
-            return await self.agent.execute(context)
-        raise RuntimeError
+            if action.action == "tool_call":
+                result = await self.tool_executor.execute(
+                    action.tool_name,
+                    **action.arguments
+                )
+                # 把当前工具执行结果保存下来
+                context.metadata["tool_result"] = result
+
+        raise RuntimeError(
+            "Agent exceeded max iterations"
+        )
