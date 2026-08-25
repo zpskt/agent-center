@@ -24,7 +24,9 @@ class DiagnoseAgent(BaseAgent):
             self,
             result: str
     ) -> AgentAction:
-
+        """
+        转换成意图
+        """
         return AgentAction.model_validate_json(
             result
         )
@@ -44,12 +46,22 @@ class DiagnoseAgent(BaseAgent):
                 "LLM response invalid"
             ) from e
 
-    async def execute(self, context: DiagnosisContext) -> DiagnoseResponse:
+    async def execute(self, context: DiagnosisContext) -> AgentAction:
 
         prompt = self.build_prompt(context)
 
         result = await self.llm_client.invoke(prompt)
         try:
-            return self.parse_response(result)
+            action = self.parse_action(result)
+            if action.action == "final":
+                if action.response is None:
+                    raise DiagnosisError(
+                        "最终诊断结果不能为空"
+                    )
+
+            return action
+
         except ValidationError as e:
-            raise DiagnosisError("LLM 返回的诊断结果格式不正确") from e
+            raise DiagnosisError(
+                "LLM 返回的 AgentAction 格式不正确"
+            ) from e

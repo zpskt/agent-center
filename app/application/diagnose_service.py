@@ -9,15 +9,14 @@
 @Description： 
 '''
 from app.agent.agent_runner import AgentRunner
-from app.agent.diagnose_agent import DiagnoseAgent
 from app.domain.context import DiagnosisContext, ConversationMessage
+from app.domain.exceptions import DiagnosisError
 from app.domain.models import DiagnoseRequest
 from app.domain.repositories.conversation_repository import ConversationRepository
 
 
 class DiagnoseService:
-    def __init__(self, agent:DiagnoseAgent, conversation_repository:ConversationRepository, runner:AgentRunner):
-        self.agent = agent
+    def __init__(self, conversation_repository:ConversationRepository, runner:AgentRunner):
         self.conversation_repository = conversation_repository
         self.runner = runner
 
@@ -42,15 +41,22 @@ class DiagnoseService:
             history=history,
         )
 
-        result = await self.agent.execute(context)
+        action = await self.runner.run(context)
 
-        await self.conversation_repository.append_message(
-            user_id=request.user_id,
-            conversation_id=request.conversation_id,
-            message=ConversationMessage(
-                role="assistant",
-                content=result.diagnosis,
+        if action.action == "final":
+            if action.response is None:
+                raise DiagnosisError("Agent 没有返回诊断结果")
+
+            await self.conversation_repository.append_message(
+                user_id=request.user_id,
+                conversation_id=request.conversation_id,
+                message=ConversationMessage(
+                    role="assistant",
+                    content=action.response.diagnosis,
+                ),
             )
-        )
 
-        return result
+            return action.response
+        raise DiagnosisError(
+            f"Agent 未返回最终诊断结果: {action.action}"
+        )

@@ -9,7 +9,7 @@
 @Description： 
 '''
 from typing import Literal
-from pydantic import BaseModel
+from pydantic import BaseModel,Field
 
 
 class DiagnoseRequest(BaseModel):
@@ -27,12 +27,7 @@ class DiagnoseResponse(BaseModel):
     recommendations: list[str]
 
 class AgentAction(BaseModel):
-
-    action: Literal[
-        "tool_call",
-        "final"
-    ]
-
+    action: Literal["tool_call", "final"]
     tool_name: str | None = None
-
-    arguments: dict = {}
+    arguments: dict = Field(default_factory=dict)
+    response: DiagnoseResponse | None = None

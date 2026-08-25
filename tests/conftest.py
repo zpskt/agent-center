@@ -21,13 +21,16 @@ class FakeLLMClient(LLMClient):
         self.last_prompt = prompt
 
         return """
-        {
-            "diagnosis": "测试诊断",
-            "confidence": 0.9,
-            "recommendations": [
-                "测试建议"
-            ]
-        }
+{
+    "action": "final",
+    "response": {
+        "diagnosis": "测试诊断",
+        "confidence": 0.9,
+        "recommendations": [
+            "测试建议"
+        ]
+    }
+}
         """
 
 class InvalidLLMClient(LLMClient):

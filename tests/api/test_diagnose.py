@@ -8,33 +8,15 @@
 @Date    ：2026/8/23 08:35 
 @Description： 
 '''
+import pytest
 from starlette.testclient import TestClient
 from app.main import app
 from app.api.diagnose import get_llm_client
 from app.infrastructure.llm.llm_client import LLMClient
 
 
-class FakeLLMClient(LLMClient):
-
-    async def invoke(self, prompt: str) -> str:
-        return """
-        {
-            "diagnosis": "测试诊断",
-            "confidence": 0.9,
-            "recommendations": [
-                "测试建议"
-            ]
-        }
-        """
-
-class InvalidLLMClient(LLMClient):
-
-    async def invoke(self, prompt: str) -> str:
-        return "这不是合法的 JSON"
-
-
-def test_diagnose_api():
-    app.dependency_overrides[get_llm_client] = lambda: FakeLLMClient()
+def test_diagnose_api(fake_llm_client):
+    app.dependency_overrides[get_llm_client] = lambda: fake_llm_client
 
     client = TestClient(app)
 

@@ -27,7 +27,9 @@ def test_tool_call_action():
 def test_final_action():
 
     action = AgentAction(
-        action="final"
+        action="final",
+    tool_name = "system_info",
+    arguments = {}
     )
 
     assert action.action == "final"

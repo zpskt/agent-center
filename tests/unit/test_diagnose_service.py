@@ -10,31 +10,13 @@
 '''
 import pytest
 
+from app.agent.agent_runner import AgentRunner
 from app.application.diagnose_service import DiagnoseService
 from app.domain.models import DiagnoseRequest
 from app.infrastructure.conversation.memory_conversation_repository import MemoryConversationRepository
-from app.main import app
 
 from app.agent.diagnose_agent import DiagnoseAgent
-from app.infrastructure.llm.llm_client import LLMClient
-
-class FakeLLMClient(LLMClient):
-
-    async def invoke(self, prompt: str) -> str:
-        return """
-        {
-            "diagnosis": "测试诊断",
-            "confidence": 0.9,
-            "recommendations": [
-                "测试建议"
-            ]
-        }
-        """
-
-class InvalidLLMClient(LLMClient):
-
-    async def invoke(self, prompt: str) -> str:
-        return "这不是合法的 JSON"
+from app.tools.executor import ToolExecutor
 
 
 @pytest.mark.asyncio
@@ -45,9 +27,12 @@ async def test_diagnose_service(fake_llm_client):
     agent = DiagnoseAgent(
         llm_client=fake_llm_client
     )
+    tool_executor = ToolExecutor()
+
+    runner = AgentRunner(agent,tool_executor)
     conversation_repository = MemoryConversationRepository()
 
-    service = DiagnoseService(agent=agent, conversation_repository=conversation_repository)
+    service = DiagnoseService(runner=runner, conversation_repository=conversation_repository)
 
     request = DiagnoseRequest(
         user_id="user-001",
@@ -70,9 +55,10 @@ async def test_diagnose_service_preserves_conversation_history(
     agent = DiagnoseAgent(
         llm_client=fake_llm_client
     )
-
+    tool_executor = ToolExecutor()
+    runner = AgentRunner(agent,tool_executor)
     service = DiagnoseService(
-        agent=agent,
+        runner=runner,
         conversation_repository=repository,
     )
 
@@ -109,9 +95,11 @@ async def test_diagnose_service_loads_previous_history(
     agent = DiagnoseAgent(
         llm_client=fake_llm_client
     )
+    tool_executor = ToolExecutor()
+    runner = AgentRunner(agent,tool_executor)
 
     service = DiagnoseService(
-        agent=agent,
+        runner=runner,
         conversation_repository=repository,
     )
 

@@ -14,7 +14,8 @@ from app.agent.diagnose_agent import DiagnoseAgent
 from app.domain.context import DiagnosisContext
 from app.domain.exceptions import DiagnosisError
 from app.infrastructure.llm.llm_client import LLMClient
-from app.domain.models import  DiagnoseResponse
+from app.domain.models import DiagnoseResponse, AgentAction
+
 
 class InvalidLLMClient(LLMClient):
 
@@ -51,10 +52,10 @@ async def test_diagnose_agent(fake_llm_client):
 
     result = await agent.execute(context)
 
-    assert isinstance(result, DiagnoseResponse)
-    assert result.diagnosis == "测试诊断"
-    assert result.confidence == 0.9
-    assert result.recommendations == ["测试建议"]
+    assert isinstance(result, AgentAction)
+    assert result.response.diagnosis == "测试诊断"
+    assert result.response.confidence == 0.9
+    assert result.response.recommendations == ["测试建议"]
 
 @pytest.mark.asyncio
 async def test_diagnose_agent_invalid_llm_response():
