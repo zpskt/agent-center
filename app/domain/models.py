@@ -31,3 +31,7 @@ class AgentAction(BaseModel):
     tool_name: str | None = None
     arguments: dict = Field(default_factory=dict)
     response: DiagnoseResponse | None = None
+
+class AgentRunResult(BaseModel):
+    action: AgentAction
+    iterations: int

@@ -10,6 +10,7 @@
 '''
 from app.agent.base_agent import BaseAgent
 from app.domain.context import AgentContext
+from app.domain.models import AgentRunResult
 from app.tools.executor import ToolExecutor
 
 
@@ -23,25 +24,29 @@ class AgentRunner:
         self.agent = agent
         self.tool_executor = tool_executor
 
-
     async def run(
-        self,
-        context: AgentContext
-    ):
+            self,
+            context: AgentContext
+    ) -> AgentRunResult:
+
         MAX_ITERATIONS = 5
-        for _ in range(MAX_ITERATIONS):
+
+        for iteration in range(1, MAX_ITERATIONS + 1):
 
             action = await self.agent.execute(context)
 
             if action.action == "final":
-                return action
+                return AgentRunResult(
+                    action=action,
+                    iterations=iteration,
+                )
 
             if action.action == "tool_call":
                 result = await self.tool_executor.execute(
                     action.tool_name,
                     **action.arguments
                 )
-                # 把当前工具执行结果保存下来
+
                 context.metadata["tool_result"] = result
 
         raise RuntimeError(

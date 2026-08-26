@@ -17,6 +17,7 @@ from app.agent.diagnose_agent import DiagnoseAgent
 from app.application.diagnose_service import DiagnoseService
 from app.domain.models import DiagnoseRequest, DiagnoseResponse
 from app.domain.repositories.conversation_repository import ConversationRepository
+from app.infrastructure.agent.agent_run_repository import AgentRunRepository
 from app.infrastructure.conversation.memory_conversation_repository import MemoryConversationRepository
 from app.infrastructure.conversation.sqlalchemy_conversation_repository import SQLAlchemyConversationRepository
 from app.infrastructure.database.database import get_db
@@ -43,9 +44,15 @@ def get_diagnose_agent(llm_client: LLMClient = Depends(get_llm_client)) -> Diagn
 def get_agent_runner(agent: DiagnoseAgent = Depends(get_diagnose_agent),tool_executor: ToolExecutor = Depends(get_tool_executor)) -> AgentRunner:
     return AgentRunner(agent=agent,tool_executor=tool_executor)
 
+def get_agent_run_repository(
+    session: AsyncSession = Depends(get_db),
+) -> AgentRunRepository:
+    return AgentRunRepository(session)
+
 def get_diagnose_service(runner: AgentRunner = Depends(get_agent_runner),
-                         conversation_repository: ConversationRepository = Depends(get_conversation_repository)) -> DiagnoseService:
-    return DiagnoseService(runner=runner, conversation_repository=conversation_repository)
+                         conversation_repository: ConversationRepository = Depends(get_conversation_repository),
+                         agent_run_repository: AgentRunRepository = Depends(get_agent_run_repository)) -> DiagnoseService:
+    return DiagnoseService(runner=runner, conversation_repository=conversation_repository, agent_run_repository=agent_run_repository)
 
 router = APIRouter(prefix='/diagnose')
 
