@@ -14,8 +14,6 @@ from app.agent.base_agent import BaseAgent
 from app.domain.context import DiagnosisContext
 from app.domain.exceptions import DiagnosisError, LLMResponseError
 from app.domain.models import DiagnoseResponse, AgentAction
-from app.infrastructure.llm.llm_client import LLMClient
-from app.prompts.diagnose import build_prompt
 from app.prompts.registry import get_prompt
 
 

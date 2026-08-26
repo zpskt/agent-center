@@ -12,6 +12,7 @@ import pytest
 
 from app.agent.diagnose_agent import DiagnoseAgent
 from app.domain.context import DiagnosisContext
+from app.tools.registry import get_all_tools
 
 
 @pytest.mark.asyncio
@@ -22,14 +23,16 @@ async def test_agent_contains_tools(
     agent = DiagnoseAgent(
         llm_client=fake_llm_client
     )
+    tools = [
+        tool.get_schema()
+        for tool in get_all_tools()
+    ]
 
     context = DiagnosisContext(
         user_id="user-001",
         conversation_id="conv-001",
         message="检查电脑",
-        available_tools=[
-            "system_info"
-        ]
+        available_tools=tools,
     )
 
     await agent.execute(context)

@@ -14,10 +14,18 @@ from abc import ABC, abstractmethod
 class BaseTool(ABC):
 
     name: str
-
     description: str
+    parameters: dict = {}
+
 
 
     @abstractmethod
     async def execute(self, **kwargs):
         pass
+
+    def get_schema(self) -> dict:
+        return {
+            "name": self.name,
+            "description": self.description.strip(),
+            "parameters": self.parameters,
+        }

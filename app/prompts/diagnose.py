@@ -51,15 +51,25 @@ def build_prompt(
         for item in context.history
     )
 
+    tools_text = "\n".join(
+        str(tool)
+        for tool in context.available_tools
+    )
+
+    tool_result = context.metadata.get("tool_result")
+
     return f"""
-    {DIAGNOSE_SYSTEM_PROMPT}
+{DIAGNOSE_SYSTEM_PROMPT}
 
-    可用工具:
-    {context.available_tools}
+可用工具：
+{tools_text}
 
-    历史对话：
-    {history_text}
+工具执行结果：
+{tool_result}
 
-    用户问题：
-    {context.message}
-    """
+历史对话：
+{history_text}
+
+用户问题：
+{context.message}
+"""

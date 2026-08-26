@@ -15,6 +15,8 @@ TOOLS = {
     "system_info": SystemInfoTool()
 }
 
+def get_all_tools() -> list:
+    return list(TOOLS.values())
 
 def get_tool(name: str):
 

@@ -35,7 +35,7 @@ async def test_system_info_tool_execute():
 async def test_system_info_tool_metadata():
 
     tool = SystemInfoTool()
-
+    print(tool.get_schema())
     assert tool.name == "system_info"
 
     assert tool.description is not None

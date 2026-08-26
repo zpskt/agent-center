@@ -13,6 +13,7 @@ from app.domain.context import DiagnosisContext, ConversationMessage
 from app.domain.exceptions import DiagnosisError
 from app.domain.models import DiagnoseRequest
 from app.domain.repositories.conversation_repository import ConversationRepository
+from app.tools.registry import get_all_tools
 
 
 class DiagnoseService:
@@ -34,11 +35,16 @@ class DiagnoseService:
             ),
             )
 
+        tools = [
+            tool.get_schema()
+            for tool in get_all_tools()
+        ]
         context = DiagnosisContext(
             user_id=request.user_id,
             conversation_id=request.conversation_id,
             message=request.message,
             history=history,
+            available_tools=tools,
         )
 
         action = await self.runner.run(context)

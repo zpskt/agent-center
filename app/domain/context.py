@@ -27,7 +27,7 @@ class AgentContext(BaseModel,ABC):
     metadata: dict = Field(
         default_factory=dict
     )
-    available_tools: list[str] = Field(
+    available_tools: list[dict] = Field(
         default_factory=list
     )
 

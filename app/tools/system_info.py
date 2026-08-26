@@ -20,6 +20,8 @@ class SystemInfoTool(BaseTool):
     包括CPU、内存、磁盘。
     """
 
+    parameters = {}
+
     async def execute(self, **kwargs):
 
         return {

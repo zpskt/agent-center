@@ -34,7 +34,7 @@ class DeepSeekClient(LLMClient):
         ),
     )
     async def invoke(self, prompt: str) -> str:
-        response = self.client.chat.completions.create(
+        response = await self.client.chat.completions.create(
             model=settings.llm_model,
             messages=[
                 {
