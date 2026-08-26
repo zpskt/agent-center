@@ -10,16 +10,17 @@
 '''
 from fastapi import APIRouter
 from fastapi.params import Depends
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.agent.agent_runner import AgentRunner
-from app.agent.base_agent import BaseAgent
 from app.agent.diagnose_agent import DiagnoseAgent
 from app.application.diagnose_service import DiagnoseService
 from app.domain.models import DiagnoseRequest, DiagnoseResponse
 from app.domain.repositories.conversation_repository import ConversationRepository
 from app.infrastructure.conversation.memory_conversation_repository import MemoryConversationRepository
+from app.infrastructure.conversation.sqlalchemy_conversation_repository import SQLAlchemyConversationRepository
+from app.infrastructure.database.database import get_db
 from app.infrastructure.llm.deepseek_client import DeepSeekClient
-from app.infrastructure.llm.fake_llm_client import FakeLLMClient
 from app.infrastructure.llm.llm_client import LLMClient
 from app.tools.executor import ToolExecutor
 
@@ -27,8 +28,8 @@ from app.tools.executor import ToolExecutor
 # ====================
 # 添加依赖
 # ====================
-def get_conversation_repository() -> ConversationRepository:
-    return MemoryConversationRepository()
+def get_conversation_repository(session: AsyncSession = Depends(get_db),) -> ConversationRepository:
+    return SQLAlchemyConversationRepository(session)
 
 def get_llm_client() -> LLMClient:
     return DeepSeekClient()

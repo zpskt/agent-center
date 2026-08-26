@@ -8,6 +8,7 @@
 @Date    ：2026/8/22 17:26 
 @Description： 
 '''
+from contextlib import asynccontextmanager
 from urllib.request import Request
 
 from fastapi import FastAPI
@@ -16,8 +17,15 @@ from starlette.responses import JSONResponse
 from app.api.diagnose import router as diagnose_router
 from app.api.health import router as health_router
 from app.domain.exceptions import DiagnosisError, LLMResponseError
+from app.infrastructure.database.database import init_db
 
-app = FastAPI()
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    await init_db()
+    yield
+app = FastAPI(  lifespan=lifespan
+)
 @app.exception_handler(DiagnosisError)
 async def diagnosis_exception_handler(
     request: Request,

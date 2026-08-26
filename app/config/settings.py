@@ -16,6 +16,8 @@ class Settings(BaseSettings):
     llm_model: str
     llm_base_url: str
     llm_timeout: int
+    database_url: str
+    database_echo: bool = False
 
     model_config = SettingsConfigDict(
         env_file=".env",
