@@ -18,7 +18,9 @@ from app.api.diagnose import router as diagnose_router
 from app.api.health import router as health_router
 from app.domain.exceptions import DiagnosisError, LLMResponseError
 from app.infrastructure.database.database import init_db
+from app.infrastructure.logging.logger import setup_logging
 
+setup_logging()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):

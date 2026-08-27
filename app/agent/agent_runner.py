@@ -12,9 +12,10 @@ from app.agent.base_agent import BaseAgent
 from app.domain.agent.tool_call_recorder import ToolCallRecorder
 from app.domain.context import AgentContext
 from app.domain.models import AgentRunResult
+from app.infrastructure.logging.logger import get_logger
 from app.tools.executor import ToolExecutor
 
-
+logger = get_logger(__name__)
 class AgentRunner:
 
     def __init__(
@@ -36,7 +37,11 @@ class AgentRunner:
     ) -> AgentRunResult:
 
         MAX_ITERATIONS = 5
-
+        logger.info(
+            "Agent run started | run_id=%s | conversation_id=%s",
+            run_id,
+            context.conversation_id,
+        )
         for iteration in range(1, MAX_ITERATIONS + 1):
 
             action = await self.agent.execute(context)
@@ -68,11 +73,21 @@ class AgentRunner:
                     context.metadata["tool_result"] = result
 
                 except Exception:
+                    logger.exception(
+                        "Tool call failed | run_id=%s | tool_call_id=%s | tool=%s",
+                        run_id,
+                        tool_call_id,
+                        action.tool_name,
+                    )
                     await self.tool_call_recorder.fail(
                         tool_call_id=tool_call_id,
                     )
                     raise
-
+        logger.error(
+            "Agent exceeded max iterations | run_id=%s | max_iterations=%s",
+            run_id,
+            MAX_ITERATIONS,
+        )
         raise RuntimeError(
             "Agent exceeded max iterations"
         )
