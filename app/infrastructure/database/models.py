@@ -8,7 +8,7 @@
 @Date    ：2026/8/26 23:38 
 @Description： 
 '''
-from datetime import datetime
+from sqlalchemy import JSON
 
 from sqlalchemy import DateTime, ForeignKey, String, Text
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
@@ -107,6 +107,49 @@ class AgentRunModel(Base):
 
     iterations: Mapped[int] = mapped_column(
         default=0,
+    )
+
+    started_at: Mapped[datetime] = mapped_column(
+        DateTime,
+        default=datetime.utcnow,
+    )
+
+    finished_at: Mapped[datetime | None] = mapped_column(
+        DateTime,
+        nullable=True,
+    )
+
+
+
+class ToolCallModel(Base):
+    __tablename__ = "tool_call"
+
+    id: Mapped[int] = mapped_column(
+        primary_key=True,
+        autoincrement=True,
+    )
+
+    run_id: Mapped[int] = mapped_column(
+        ForeignKey("agent_run.id"),
+        index=True,
+    )
+
+    tool_name: Mapped[str] = mapped_column(
+        String(64),
+    )
+
+    arguments: Mapped[dict] = mapped_column(
+        JSON,
+        default=dict,
+    )
+
+    result: Mapped[dict | None] = mapped_column(
+        JSON,
+        nullable=True,
+    )
+
+    status: Mapped[str] = mapped_column(
+        String(32),
     )
 
     started_at: Mapped[datetime] = mapped_column(

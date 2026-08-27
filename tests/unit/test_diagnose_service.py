@@ -12,12 +12,35 @@ import pytest
 
 from app.agent.agent_runner import AgentRunner
 from app.application.diagnose_service import DiagnoseService
+from app.domain.agent.tool_call_recorder import ToolCallRecorder
 from app.domain.models import DiagnoseRequest
+from app.infrastructure.agent.tool_call_repository import ToolCallRepository
 from app.infrastructure.conversation.memory_conversation_repository import MemoryConversationRepository
 
 from app.agent.diagnose_agent import DiagnoseAgent
 from app.tools.executor import ToolExecutor
+class FakeToolCallRecorder(ToolCallRecorder):
 
+    async def start(
+        self,
+        run_id: int,
+        tool_name: str,
+        arguments: dict,
+    ) -> int:
+        return 1
+
+    async def success(
+        self,
+        tool_call_id: int,
+        result: dict,
+    ) -> None:
+        pass
+
+    async def fail(
+        self,
+        tool_call_id: int,
+    ) -> None:
+        pass
 
 @pytest.mark.asyncio
 async def test_diagnose_service(fake_llm_client):
@@ -28,8 +51,8 @@ async def test_diagnose_service(fake_llm_client):
         llm_client=fake_llm_client
     )
     tool_executor = ToolExecutor()
-
-    runner = AgentRunner(agent,tool_executor)
+    tool_call_recoder = FakeToolCallRecorder()
+    runner = AgentRunner(agent,tool_executor,tool_call_recoder)
     conversation_repository = MemoryConversationRepository()
 
     service = DiagnoseService(runner=runner, conversation_repository=conversation_repository)
@@ -56,7 +79,8 @@ async def test_diagnose_service_preserves_conversation_history(
         llm_client=fake_llm_client
     )
     tool_executor = ToolExecutor()
-    runner = AgentRunner(agent,tool_executor)
+    tool_call_recoder = FakeToolCallRecorder()
+    runner = AgentRunner(agent,tool_executor,tool_call_recoder)
     service = DiagnoseService(
         runner=runner,
         conversation_repository=repository,
@@ -96,7 +120,8 @@ async def test_diagnose_service_loads_previous_history(
         llm_client=fake_llm_client
     )
     tool_executor = ToolExecutor()
-    runner = AgentRunner(agent,tool_executor)
+    tool_call_recorder = FakeToolCallRecorder()
+    runner = AgentRunner(agent,tool_executor,tool_call_recorder)
 
     service = DiagnoseService(
         runner=runner,

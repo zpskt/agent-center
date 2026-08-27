@@ -15,9 +15,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.agent.agent_runner import AgentRunner
 from app.agent.diagnose_agent import DiagnoseAgent
 from app.application.diagnose_service import DiagnoseService
+from app.domain.agent.tool_call_recorder import ToolCallRecorder
 from app.domain.models import DiagnoseRequest, DiagnoseResponse
 from app.domain.repositories.conversation_repository import ConversationRepository
 from app.infrastructure.agent.agent_run_repository import AgentRunRepository
+from app.infrastructure.agent.tool_call_repository import ToolCallRepository
 from app.infrastructure.conversation.memory_conversation_repository import MemoryConversationRepository
 from app.infrastructure.conversation.sqlalchemy_conversation_repository import SQLAlchemyConversationRepository
 from app.infrastructure.database.database import get_db
@@ -41,8 +43,24 @@ def get_tool_executor() -> ToolExecutor:
 def get_diagnose_agent(llm_client: LLMClient = Depends(get_llm_client)) -> DiagnoseAgent:
     return DiagnoseAgent(llm_client=llm_client)
 
-def get_agent_runner(agent: DiagnoseAgent = Depends(get_diagnose_agent),tool_executor: ToolExecutor = Depends(get_tool_executor)) -> AgentRunner:
-    return AgentRunner(agent=agent,tool_executor=tool_executor)
+def get_tool_call_recorder(
+    session: AsyncSession = Depends(get_db),
+) -> ToolCallRepository:
+    return ToolCallRepository(session)
+
+def get_agent_runner(
+    agent: DiagnoseAgent = Depends(get_diagnose_agent),
+    tool_executor: ToolExecutor = Depends(get_tool_executor),
+    tool_call_recorder: ToolCallRecorder = Depends(
+        get_tool_call_recorder
+    ),
+) -> AgentRunner:
+
+    return AgentRunner(
+        agent=agent,
+        tool_executor=tool_executor,
+        tool_call_recorder=tool_call_recorder,
+    )
 
 def get_agent_run_repository(
     session: AsyncSession = Depends(get_db),

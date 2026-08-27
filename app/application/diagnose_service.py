@@ -57,7 +57,7 @@ class DiagnoseService:
         )
 
         try:
-            run_result = await self.runner.run(context)
+            run_result = await self.runner.run(context,run_id=run.id)
 
             action = run_result.action
             iterations = run_result.iterations
